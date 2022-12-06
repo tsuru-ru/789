@@ -1,0 +1,172 @@
+#include <iostream>
+#include <stdio.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+
+
+
+
+class Graph {
+private:
+    int begin_index;
+    int end_index;
+    int size_Graph;
+    int waySize_Graph;
+    vector<int> FIKS;
+    vector<int> MIN_WEG;
+    vector<int> VON_PUNKT;
+    vector< vector<int> > DUG;
+    int min = INT_MAX;
+    int min_index = INT_MAX;
+    int max = INT_MAX;
+    
+
+public:
+
+
+    Graph(int size) {
+        size_Graph = size;
+        FIKS.reserve(size_Graph);
+        MIN_WEG.reserve(size_Graph);
+        VON_PUNKT.reserve(size_Graph);
+        DUG.reserve(size_Graph);
+        VON_PUNKT[0] = -1;
+
+        for (int i = 0; i < size_Graph; i++) {
+            FIKS.push_back(0);
+            vector<int> temp(size_Graph);
+            DUG.push_back(temp);
+        }
+
+    };
+
+
+    void read(string name) {
+        int arr[size_Graph][size_Graph];
+
+
+        string path = name;
+        ifstream fin;
+        fin.open(path);
+
+
+        for (int i = 0; i < size_Graph; i++)
+        {
+            for (int j = 0; j < size_Graph; j++)
+            {
+                fin >> arr[i][j];
+                 DUG[i][j] = arr[i][j];
+            }
+        }
+
+
+        
+    };
+
+
+    void make_Graph(int begin) {
+        vector<int> temp(size_Graph);
+        for (int i = 0; i < size_Graph; i++) {
+            temp.push_back(0);
+
+        }
+        begin_index = begin;
+        int a;
+        for (int i = 0; i < size_Graph; i++) {
+            DUG[i][i] = 0;
+
+
+        }
+        for (int i = 0; i < size_Graph; i++) {
+            MIN_WEG[i] = DUG[begin_index][i];
+           
+        }
+        FIKS[begin] = 1;
+        VON_PUNKT[0] = -1;
+        
+
+
+    };
+
+    
+    
+    void BFS(int end){
+        end_index = end;
+        queue<int> Queue;
+        Queue.push(begin_index);
+        int preview[size_Graph];
+        preview[0] = -1;
+        int k = 0;
+        while(!Queue.empty()){
+            int temp_begin = Queue.front();
+            Queue.pop();
+            VON_PUNKT[k++] = temp_begin + 1;
+            
+            for (int j = 0; j < size_Graph; j++) {
+            int v = DUG[temp_begin][j];
+            if (FIKS[j] == 0 and v!= 0) {
+                Queue.push(j);
+                FIKS[j] = 1;
+                
+        }
+    }
+}
+        
+    };
+    
+    
+    void print() {
+        FILE* file = fopen("way.txt", "a");
+        for (int i = 0; i < size_Graph; i++) {
+            if (VON_PUNKT[i] != end_index + 1) fprintf(file, "%d ", VON_PUNKT[i]);
+            else break;
+            
+
+        }
+        fprintf(file, "%d ",end_index + 1);
+        fprintf(file, "\n");
+        fclose(file);
+
+
+    }
+
+
+
+
+};
+
+int main()
+{
+    int instruction;
+    int size;
+    int begin;
+    int end;
+    string file_name;
+    do {
+        cout << "Введите размер графа: ";
+        cin >> size;
+        Graph Graph1(size);
+        cout << "Введите название файла с графом. Не забудьте написать его расширение! : " << endl;
+        cin >> file_name;
+        Graph1.read(file_name);
+        cout << "Введите начальную вершину ";
+        cin >> begin;
+        cout << "Введите конечную вершину ";
+        cin >> end;
+        Graph1.make_Graph(begin - 1);
+        Graph1.BFS(end - 1);
+        Graph1.print();
+        cout << "Ваш путь от " << begin << " до " << end << "находится в файле way.txt" << endl;
+        cout << "Введите 0, если хотите закончить. Чтобы продолжить введите любое другое число.";
+        cin >> instruction;
+    } while (instruction != 0);
+    return 0;
+};
